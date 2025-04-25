@@ -32,7 +32,27 @@ SMODS.Atlas {
   py = 34
 }
 
+SMODS.Atlas {
+  key = 'familiar_atlas',
+  path = 'familiar.png',
+  px = 71,
+  py = 95
+}
 
+SMODS.Atlas {
+  key = 'modicon',
+  px = 32,
+  py = 32,
+  path = 'modicon.png'
+}
+
+SMODS.Rarity({
+	key = "familiar_face",
+	loc_txt = {
+    name = "Familiar Face"
+  },
+	badge_colour = HEX("12077d"),
+})
 
 assert(SMODS.load_file('utils/context.lua'))()
 assert(SMODS.load_file('utils/functions.lua'))()
@@ -67,9 +87,7 @@ if All_in_Jest.config.moons_enabled then
   assert(SMODS.load_file('consumables/2000_eu16.lua'))()
   assert(SMODS.load_file('consumables/kuiper.lua'))()
 
-  -- Spectral planets
-  assert(SMODS.load_file('consumables/pulsar.lua'))()
-  assert(SMODS.load_file('consumables/gravastar.lua'))()
+  
   if next(SMODS.find_mod("paperback")) or next(SMODS.find_mod("Bunco")) then
     if PB_UTIL and PB_UTIL.config.suits_enabled or next(SMODS.find_mod("Bunco")) then
       assert(SMODS.load_file('consumables/paper_weywot.lua'))()
@@ -88,6 +106,9 @@ assert(SMODS.load_file('consumables/magus.lua'))()
 --spectrals 
 assert(SMODS.load_file('consumables/trefle.lua'))()
 assert(SMODS.load_file('consumables/shade.lua'))()
+-- Spectral planets
+assert(SMODS.load_file('consumables/pulsar.lua'))()
+assert(SMODS.load_file('consumables/gravastar.lua'))()
 --enhancements
 assert(SMODS.load_file('enhancements/fervent.lua'))()
 --way too many fucking jokers
@@ -328,7 +349,18 @@ assert(SMODS.load_file('jokers/stained_glass_joker.lua'))()
 --assert(SMODS.load_file('jokers/heyokha.lua'))()
 --assert(SMODS.load_file('jokers/casual_absent_paranoia.lua'))()
 
-
+--familar faces
+ 
+--assert(SMODS.load_file('jokers/prototype.lua'))()
+--assert(SMODS.load_file('jokers/spoofy.lua'))()
+--assert(SMODS.load_file('jokers/toyrapple.lua'))()
+--assert(SMODS.load_file('jokers/grass.lua'))()
+--assert(SMODS.load_file('jokers/mythie.lua'))()
+--assert(SMODS.load_file('jokers/zan.lua'))()
+--assert(SMODS.load_file('jokers/metrollen.lua'))()
+--assert(SMODS.load_file('jokers/clay.lua'))()
+--assert(SMODS.load_file('jokers/generic.lua'))()
+--assert(SMODS.load_file('jokers/cheddar.lua'))()
 
 --legendaries
 

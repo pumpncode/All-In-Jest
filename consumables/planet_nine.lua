@@ -7,7 +7,7 @@ SMODS.Consumable {
 	pos = { x = 3, y = 1 },
 	cost = 3,
 	unlocked = true,
-	discovered = true,
+	discovered = false,
 	config = { hand_type = "Five of a Kind", softlock = true, moon = true },
 	hand_type = 'Five of a Kind',
 	atlas = 'consumable_atlas',

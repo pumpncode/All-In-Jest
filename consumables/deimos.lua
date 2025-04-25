@@ -8,7 +8,7 @@ SMODS.Consumable {
 	cost = 3,
 	config = {hand_type = "Four of a Kind", moon = true},
 	unlocked = true,
-	discovered = true,
+	discovered = false,
 	atlas = 'consumable_atlas',
     loc_vars = function(self, info_queue, card)
 		return {

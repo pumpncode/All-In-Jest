@@ -7,7 +7,7 @@ mk2 = {
 	pos = { x = 0, y = 6 },
 	cost = 3,
 	unlocked = true,
-	discovered = true,
+	discovered = false,
 	config = { hand_type = "paperback_Spectrum Five", softlock = true, moon = true },
 	atlas = 'consumable_atlas',
     loc_vars = function(self, info_queue, card)

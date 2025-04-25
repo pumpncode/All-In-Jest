@@ -7,7 +7,7 @@ SMODS.Consumable {
 	pos = { x = 4, y = 2 },
 	cost = 3,
 	unlocked = true,
-	discovered = true,
+	discovered = false,
 	config = {hand_type = "Flush", moon = true},
 	atlas = 'consumable_atlas',
     loc_vars = function(self, info_queue, card)

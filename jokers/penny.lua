@@ -10,7 +10,7 @@ SMODS.Joker {
     atlas = 'joker_atlas',
     cost = 4,
     unlocked = true,
-    discovered = true,
+    discovered = false,
     blueprint_compat = true,
     eternal_compat = true,
 
@@ -42,5 +42,21 @@ SMODS.Joker {
       end
 
       return nil
-  end
+  end,
+
+  in_pool = function(self, args)
+    local seal_count = 0
+    if G.GAME and G.playing_cards then
+        for _, card in ipairs(G.playing_cards) do
+            if card.seal == 'Gold' then
+                seal_count = seal_count + 1
+            end
+        end
+    end
+    if seal_count > 0 then
+        return true
+    else
+        return false
+    end
+  end,
   }

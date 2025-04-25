@@ -12,7 +12,7 @@ SMODS.Joker {
     atlas = 'legendary_atlas',
     cost = 20,
     unlocked = true,
-    discovered = true,
+    discovered = false,
     blueprint_compat = true,
     eternal_compat = true,
     soul_pos = { x = 5, y = 1},
@@ -54,17 +54,16 @@ SMODS.Joker {
           end
       end
 
-      -- Check individual cards during scoring
       if context.individual and context.cardarea == G.play then
-          -- If a Stone Card is scored, increase this Joker's Xmult
           if context.other_card.ability.name == 'Stone Card' and not context.blueprint then
               card.ability.extra.x_mult = card.ability.extra.x_mult + card.ability.extra.xmult_mod
-              card_eval_status_text(card, 'extra', nil, nil, nil, {message = localize('k_upgrade_ex')})
-              card:juice_up(0.3, 0.2)
+              return {
+                extra = {focus = card, message = localize('k_upgrade_ex')},
+                card = card,
+            }
           end
       end
 
-      -- Apply the Joker's Xmult during the main Joker calculation phase
       if context.joker_main then
           if card.ability.extra.x_mult > 1 then
                return {

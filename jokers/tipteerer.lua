@@ -10,7 +10,7 @@ SMODS.Joker {
   atlas = 'joker_atlas',
   cost = 6,
   unlocked = true,
-  discovered = true,
+  discovered = false,
   blueprint_compat = false,
   eternal_compat = true,
 
@@ -22,7 +22,7 @@ SMODS.Joker {
           sell_cost = sell_cost + G.jokers.cards[i].sell_cost
         end
       end
-      card.ability.extra.money = math.ceil(sell_cost / 10)
+      card.ability.extra.money = math.ceil(sell_cost / 5)
     end
     return {
       vars = {

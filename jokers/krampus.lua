@@ -1,5 +1,5 @@
 SMODS.Joker {
-  -- Assuming 'jen' prefix based on previous examples
+  
   key = "krampus",
 
   config = {
@@ -13,7 +13,7 @@ SMODS.Joker {
   atlas = 'joker_atlas',
   cost = 7,
   unlocked = true,
-  discovered = true,
+  discovered = false,
 
 
   blueprint_compat = true,

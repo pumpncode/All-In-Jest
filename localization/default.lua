@@ -447,7 +447,7 @@ return {
             j_aij_sneaky_pete = {
                 name = "Sneaky Pete",
                 text = {
-                    'Earn {C:money}$1{} at end of round',
+                    'Earn {C:money}$2{} at end of round',
                     'for every {C:money}Gold Seal{}',
                     'in your {C:attention}full deck',
                     '{C:inactive}(Currently {C:money}$#1#{C:inactive})'
@@ -516,7 +516,9 @@ return {
                 name = "The Jester",
                 text = {
                     "Selling a {C:attention}Joker{} grants a",
-                    "{C:tarot}The Fool{} Tarot card"
+                    "{C:tarot}The Fool{} Tarot card",
+                    "{C:inactive}(Works once per round){C:inactive}",
+                    "{C:inactive}#1#{}"
                 },
             },
             j_aij_joka_lisa = { name = "Joka Lisa", text = { "" } },
@@ -686,6 +688,27 @@ return {
             j_aij_casual_absent_paranoia = { name = "Casual-Absent Paranoia", text = { "" } },
 
 
+            j_aij_prototype = { name = "Prototype", text = {
+                "{C:inactive}\"Lol I don't know if I",
+            "{C:inactive}have any quotes in me\""} },
+            j_aij_spoofy = { name = "Spoofy", text = {
+                "{C:inactive}\"You should play Braptro\""} },
+            j_aij_toyrapple = { name = "Toyrapple", text = {""} },
+            j_aij_grass = { name = "Grass", text = {
+                "\"the game\""} },
+            j_aij_mythie = { name = "Mythie", text = {
+                "{C:inactive}\"Eating toast in bed is",
+            "{C:inactive}my ability\""} },
+            j_aij_zan = { name = "Zan", text = {""} },
+            j_aij_metrollen = { name = "Metrollen", text = {""} },
+            j_aij_clay = { name = "Clay", text = {""} },
+            j_aij_generic = { name = "Gen-Eric", text = {
+                "{C:inactive}\"The rest was blanked out",
+                "{C:inactive}for the sake of game balance\""
+            } },
+            j_aij_cheddar = { name = "Cheddar", text = {""} },
+
+
 
             j_aij_nybbas = { name = "Nybbas", text = { "" }, unlock = { "?????" } },
             j_aij_doink = { name = "Doink", text = { "" }, unlock = { "?????" } },
@@ -733,8 +756,6 @@ return {
                     "Retriggers all {C:attention}Kings{}",
                     "once for every {C:attention}Queen{}",
                     "held in hand.",
-                    "Kings give {X:red,C:white}X#1#{} Mult",
-                    "when scored"
                 },
                 unlock = {
                     "?????"
@@ -1078,7 +1099,7 @@ return {
                 name = 'Shade',
                 text = {
                     'Add {C:dark_edition}Negative{} edtion',
-                    'to {C:attention}1{} selected',
+                    'to {C:attention}1{} random',
                     'card in hand'
                 }
             },
@@ -1089,6 +1110,7 @@ return {
                     '{C:attention}Joker{} of the {C:attention}highest rarity',
                     'with a different random {C:attention}Joker{}',
                     'of the {C:attention}same rarity',
+                    "{C:inactive}(Cannot be eternal){}"
                 }
             },
         },

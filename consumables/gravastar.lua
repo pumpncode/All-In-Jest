@@ -7,7 +7,7 @@ SMODS.Consumable {
     soul_rate = 0.003,
     soul_set = 'Planet',
 	unlocked = true,
-	discovered = true,
+	discovered = false,
 	config = {moon = true},
 	atlas = 'consumable_atlas',
     loc_vars = function(self, info_queue, card)

@@ -4,7 +4,7 @@ SMODS.Tag {
     pos = { x = 0, y = 0 },
     atlas = 'tag_atlas',
 
-    discovered = true,
+    discovered = false,
 
     loc_vars = function(self, info_queue)
     end,
