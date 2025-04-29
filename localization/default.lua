@@ -8,6 +8,7 @@ return {
             k_asteroid = "Asteroid",
             aij_requires_restart = "Requires Restart",
             aij_enable_moons = "Enable Moons",
+            k_aij_guess_the_jest = "Guess the Jest",
         }
     },
     descriptions = {
@@ -818,7 +819,14 @@ return {
             j_aij_xinmo = { name = "Xinmo", text = { "" }, unlock = { "?????" } },
             j_aij_chunyu = { name = "Chunyu", text = { "" }, unlock = { "?????" } },
             j_aij_fantasio = { name = "Fantasio", text = { "" }, unlock = { "?????" } },
-            j_aij_sexton = { name = "Sexton", text = { "" }, unlock = { "?????" } }
+            j_aij_sexton = { name = "Sexton", text = { "" }, unlock = { "?????" } },
+            j_aij_dongtong = { 
+                name = "Dongtong",
+                text = { 
+                    "{C:green}Doubles{} most {C:attention}Joker{}",
+                    "{C:attention}Effects" 
+                } 
+            },
         },        
         Planet = {
             c_aij_vulcanoid = {
@@ -1147,6 +1155,13 @@ return {
                     'Replaces Joker with', 
                     'a random Joker of',
                     'the same rarity'
+                }
+            },
+            p_aij_guess_the_jest = {
+                name = "Guess the Jest Pack",
+                text = {
+                    'Choose {C:attention}#1#{} of {C:attention}#2#{} hidden',
+                    '{C:legendary,E:2}Legendary{} Jokers'
                 }
             }
         }
