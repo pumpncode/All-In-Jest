@@ -90,7 +90,11 @@ SMODS.Atlas {
 SMODS.Shader {
     key = 'silhouette',
     path = 'silhouette.fs',
-  }
+ }
+SMODS.Shader {
+    key = 'chaotic',
+    path = 'chaotic.fs',
+ }
 
 SMODS.Rarity({
 	key = "familiar_face",
@@ -115,8 +119,17 @@ SMODS.Gradient {
     cycle = 5,
     interpolation = 'trig'
 }
+SMODS.Gradient {
+    key = 'stellar',
+    colours = {
+        HEX('666694'), HEX('7a73bb')
+    },
+    cycle = 5,
+    interpolation = 'trig'
+}
 AllInJest = {}
 assert(SMODS.load_file('Utils/context.lua'))()
+assert(SMODS.load_file('Utils/draw.lua'))()
 assert(SMODS.load_file('Utils/functions.lua'))()
 assert(SMODS.load_file('Utils/overrides.lua'))()
 assert(SMODS.load_file('Utils/ui.lua'))()

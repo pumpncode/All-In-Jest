@@ -32,12 +32,30 @@ end
 local patched_cache = {}
 
 local function patch_text(txt)
-    if not txt:find("get_id", 1, true) then
-        return txt
-    end
-    for _, p in ipairs(id_patterns) do
-        txt = txt:gsub(p.patt, p.repl)
-    end
+    txt = txt:gsub(
+        "([%w_%[%]%.#]+):get_id%(%s*%)%s*%%%s*([%w_%[%]%.%(%)#]+)%s*==%s*([%w_%[%]%.%(%)#]+)",
+        "ids_op(%1, \"mod\", %2, %3)"
+    )
+
+    for _, op in ipairs({">=", "<=", "~=", "==", ">", "<"}) do
+        local esc = op:gsub("([%^%$%(%)%%%.%[%]%*%+%-%?])", "%%%1")
+        txt = txt:gsub(
+            "([%w_%[%]%.#]+):get_id%(%s*%)%s*" .. esc .. "%s*([%w_%[%]%.#]+):get_id%(%s*%)",
+            "ids_op(%1, \""..op.."\", %2:get_id())"
+        )
+        txt = txt:gsub(
+            "([%w_%[%]%.#]+):get_id%(%s*%)%s*" .. esc .. "%s*([%w_%[%]%.%(%)#'\"]+)",
+            "ids_op(%1, \""..op.."\", %2)"
+        )
+
+
+end
+
+    txt = txt:gsub(
+      "(pseudorandom%([^%)]+%))%s*([><~=]+)%s*([%w_%[%]%.]+)%s*/%s*([%w_%[%]%.]+)",
+      "get_probability(%1, \"%2\", %3, %4)"
+    )
+
     return txt
 end
 
@@ -169,10 +187,29 @@ end
 
 local patched_cache = {}
 local function patch_text(txt)
-    if not txt:find("get_id", 1, true) then return txt end
-    for _, p in ipairs(id_patterns) do
-        txt = txt:gsub(p.patt, p.repl)
-    end
+    txt = txt:gsub(
+        "([%w_%[%]%.#]+):get_id%(%s*%)%s*%%%s*([%w_%[%]%.%(%)#]+)%s*==%s*([%w_%[%]%.%(%)#]+)",
+        "ids_op(%1, \"mod\", %2, %3)"
+    )
+
+    for _, op in ipairs({">=", "<=", "~=", "==", ">", "<"}) do
+        local esc = op:gsub("([%^%$%(%)%%%.%[%]%*%+%-%?])", "%%%1")
+        txt = txt:gsub(
+            "([%w_%[%]%.#]+):get_id%(%s*%)%s*" .. esc .. "%s*([%w_%[%]%.#]+):get_id%(%s*%)",
+            "ids_op(%1, \""..op.."\", %2:get_id())"
+        )
+        txt = txt:gsub(
+            "([%w_%[%]%.#]+):get_id%(%s*%)%s*" .. esc .. "%s*([%w_%[%]%.%(%)#'\"]+)",
+            "ids_op(%1, \""..op.."\", %2)"
+        )
+
+end
+
+    txt = txt:gsub(
+      "(pseudorandom%([^%)]+%))%s*([><~=]+)%s*([%w_%[%]%.]+)%s*/%s*([%w_%[%]%.]+)",
+      "get_probability(%1, \"%2\", %3, %4)"
+    )
+
     return txt
 end
 
@@ -204,6 +241,36 @@ payload = '''
 NFS.read = real_read
 '''
 match_indent = true 
+
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = "function Card:start_dissolve(dissolve_colours, silent, dissolve_time_fac, no_juice)"
+position = "after" 
+match_indent = true
+payload = '''
+    local has_anchor = false
+    local location = 0
+    if G.jokers and self.ability.set == 'Joker' then
+        if G.jokers and G.jokers.cards then
+            for i = 1, #G.jokers.cards do
+                if G.jokers.cards[i].config and G.jokers.cards[i].config.center_key == "j_aij_anchor" then
+                    has_anchor = true
+                    location = i
+                end
+            end
+        end
+        if has_anchor then
+            local left  = location - 1
+            local right = location + 1
+            local nearby = (left >= 1 and G.jokers.cards[left].config.center_key == self.config.center_key) or (right <= #G.jokers.cards and G.jokers.cards[right].config.center_key == self.config.center_key)
+            if nearby and self.ability.jest_sold_self == nil then
+                self.getting_sliced = false
+                return
+            end
+        end
+    end
+'''
 
 #Memory_card
 [[patches]]
@@ -271,6 +338,113 @@ end
 
 [[patches]]
 [patches.pattern]
+target = "card.lua"
+pattern = "function Card:start_dissolve(dissolve_colours, silent, dissolve_time_fac, no_juice)"
+position = "after" 
+match_indent = true
+payload = '''
+    local has_anchor = false
+    local location = 0
+    if G.jokers and self.ability.set == 'Joker' then
+        if G.jokers and G.jokers.cards then
+            for i = 1, #G.jokers.cards do
+                if G.jokers.cards[i].config and G.jokers.cards[i].config.center_key == "j_aij_anchor" then
+                    has_anchor = true
+                    location = i
+                end
+            end
+        end
+        if has_anchor then
+            local left  = location - 1
+            local right = location + 1
+            local nearby = (left >= 1 and G.jokers.cards[left].config.center_key == self.config.center_key) or (right <= #G.jokers.cards and G.jokers.cards[right].config.center_key == self.config.center_key)
+
+            if nearby and self.ability.jest_sold_self == nil then
+                self.getting_sliced = false
+                return
+            end
+        end
+    end
+'''
+
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = "G.GAME.pack_choices = self.ability.choose or self.config.center.config.choose or 1"
+position = "after" 
+match_indent = true
+payload = '''
+if G.GAME.jest_change_booster_options.trigger then
+    if G.GAME.jest_change_booster_options.option == "pick" or G.GAME.jest_change_booster_options.option == "both" then
+        -- Pemdas order
+        if G.GAME.jest_change_booster_options.op.mult ~= 0 then
+            G.GAME.pack_choices = G.GAME.pack_choices * G.GAME.jest_change_booster_options.op.mult
+            if G.GAME.jest_change_booster_options.option ~= "both" then
+                G.GAME.jest_change_booster_options.op.mult = 0
+            end
+        end
+        if G.GAME.jest_change_booster_options.op.div ~= 0 then
+            G.GAME.pack_choices = G.GAME.pack_choices / G.GAME.jest_change_booster_options.op.div
+            if G.GAME.jest_change_booster_options.option ~= "both" then
+                G.GAME.jest_change_booster_options.op.div = 0
+            end
+        end
+        if G.GAME.jest_change_booster_options.op.add ~= 0 then
+            G.GAME.pack_choices = G.GAME.pack_choices + G.GAME.jest_change_booster_options.op.add
+            if G.GAME.jest_change_booster_options.option ~= "both" then
+                G.GAME.jest_change_booster_options.op.add = 0
+            end
+        end
+        if G.GAME.jest_change_booster_options.op.sub ~= 0 then
+            G.GAME.pack_choices = G.GAME.pack_choices - G.GAME.jest_change_booster_options.op.sub
+            if G.GAME.jest_change_booster_options.option ~= "both" then
+                G.GAME.jest_change_booster_options.op.sub = 0
+            end
+        end
+        if G.GAME.jest_change_booster_options.option ~= "both" then
+            G.GAME.jest_change_booster_options.option = ""
+        end
+    end
+    if G.GAME.jest_change_booster_options.option ~= "both" then
+        G.GAME.jest_change_booster_options.trigger = false
+    end
+end
+'''
+
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = "local _size = self.ability.extra"
+position = "after" 
+match_indent = true
+payload = '''
+if G.GAME.jest_change_booster_options.trigger then
+    if G.GAME.jest_change_booster_options.option == "size" or G.GAME.jest_change_booster_options.option == "both" then
+        -- Pemdas order
+        if G.GAME.jest_change_booster_options.op.mult ~= 0 then
+            _size = _size * G.GAME.jest_change_booster_options.op.mult
+            G.GAME.jest_change_booster_options.op.mult = 0
+        end
+        if G.GAME.jest_change_booster_options.op.div ~= 0 then
+            _size = _size / G.GAME.jest_change_booster_options.op.div
+            G.GAME.jest_change_booster_options.op.div = 0
+        end
+        if G.GAME.jest_change_booster_options.op.add ~= 0 then
+            _size = _size + G.GAME.jest_change_booster_options.op.add
+            G.GAME.jest_change_booster_options.op.add = 0
+        end
+        if G.GAME.jest_change_booster_options.op.sub ~= 0 then
+            _size = _size - G.GAME.jest_change_booster_options.op.sub
+            G.GAME.jest_change_booster_options.op.sub = 0
+        end
+        G.GAME.jest_change_booster_options.option = ""
+    end
+    G.GAME.jest_change_booster_options.trigger = false
+end
+'''
+
+[[patches]]
+[patches.pattern]
 target = "game.lua"
 pattern = "G.CONTROLLER:snap_to({node = G.shop:get_UIE_by_ID('next_round_button')})"
 position = "before"
@@ -331,6 +505,22 @@ match_indent = true
 [[patches]] 
 [patches.pattern]
 target = "functions/state_events.lua"
+pattern = "-- TARGET: effects before scoring starts"
+position = "before"
+payload = '''
+for i = 1, #scoring_hand do
+    if scoring_hand[i].ability.jest_chaotic_card ~= nil and scoring_hand[i].ability.jest_chaotic_card then
+        local random_enhancement_key = SMODS.poll_enhancement({ guaranteed = true, key_append = 'jest_chaotic_card_enhance'..i })
+        scoring_hand[i].ability.jest_chaotic_card_changing = true
+        scoring_hand[i]:set_ability(G.P_CENTERS[random_enhancement_key or 'c_base'], nil, true)
+    end
+end
+'''
+match_indent = true
+
+[[patches]] 
+[patches.pattern]
+target = "functions/state_events.lua"
 pattern = "draw_card(G.hand, G.discard, i*100/highlighted_count, 'down', false, G.hand.highlighted[i])"
 position = "before"
 payload = '''
@@ -374,6 +564,69 @@ if G.jokers ~= nil and G.jokers.cards then
 end
 '''
 match_indent = true
+
+[[patches]] 
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = "G.GAME.tags[#G.GAME.tags+1] = _tag"
+position = "after"
+payload = '''
+local toto_count = 0
+
+if G.jokers and G.jokers.cards then
+    for _, j in ipairs(G.jokers.cards) do
+        if j.config and j.config.center_key == "j_aij_toto" then
+            toto_count = toto_count + 1
+        end
+    end
+end
+
+if toto_count > 0 and _tag.key ~= 'tag_double' and (not _tag.config.jest_tag_duplicate_trigger) then
+    for i = 1, toto_count do
+        for i = 1, 2 do
+            G.E_MANAGER:add_event(Event({
+                trigger = 'after',
+                delay = 0.9,
+                func = function()
+                    local temptag = Tag(_tag.key)
+                    temptag.config.jest_tag_duplicate_trigger = true
+                    add_tag(temptag)
+                    return true
+                end
+            }))
+        end
+    end
+end
+
+local taggart_count = 0
+
+if G.jokers and G.jokers.cards then
+    for _, j in ipairs(G.jokers.cards) do
+        if j.config and j.config.center_key == "j_aij_taggart" then
+            taggart_count = taggart_count + 1
+        end
+    end
+end
+
+if taggart_count > 0 and _tag.key ~= 'tag_double' and (not _tag.config.jest_tag_duplicate_trigger) then
+    for i = 1, taggart_count do
+        for i = 1, 1 do
+            G.E_MANAGER:add_event(Event({
+                trigger = 'after',
+                delay = 0.9,
+                func = function()
+                    local temptag = Tag(_tag.key)
+                    temptag.config.jest_tag_duplicate_trigger = true
+                    add_tag(temptag)
+                    return true
+                end
+            }))
+        end
+    end
+end
+'''
+match_indent = true
+
 
 [[patches]] 
 [patches.pattern]
@@ -589,18 +842,36 @@ if has_Aluzinu then
         add = true
         goto continue_has_Aluzinu
     end
+end
+'''
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''
+local center = pseudorandom_element(_pool, pseudoseed(_pool_key)) 
+'''
+position = "after"
+match_indent = true
+payload = '''
+local has_Aluzinu = false
+if G.jokers ~= nil and G.jokers.cards then
+    for _, j in ipairs(G.jokers.cards) do
+        if j.config and j.config.center_key == "j_aij_aluzinnu" then
+            has_Aluzinu = true
+        end
+    end
+end
+if has_Aluzinu then
     if pseudorandom('aluzinnu') < 0.05 then
         local temp_key = math.random(1,3)
         if temp_key == 1 then
-            v.key = "v_petroglyph"
+            center = "v_petroglyph"
         else
-            v.key = "v_hieroglyph"
+            center = "v_hieroglyph"
         end
-        add = true
-        goto continue_has_Aluzinu
     end
 end
-
 '''
 
 [[patches]]

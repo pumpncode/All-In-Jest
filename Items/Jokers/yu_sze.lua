@@ -1,7 +1,7 @@
 local yu_sze = {
     object_type = "Joker",
     order = 1034,
-     ignore = true,
+    
     key = "yu_sze",
     config = {
       xmult = 2
@@ -13,8 +13,8 @@ local yu_sze = {
     cost = 20,
     unlocked = false,
     discovered = false,
-    blueprint_compat = false,
-    eternal_compat = false,
+    blueprint_compat = true,
+    eternal_compat = true,
     soul_pos = { x = 3, y = 7},
   
     loc_vars = function(self, info_queue, card)

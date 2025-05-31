@@ -14,6 +14,7 @@ match_indent = true
 payload = '''
 jest_magick_joker_card = {suit = 'Spades'},
 jest_highest_scored_mult = {amount = 0, trigger = true},
+jest_you_broke_it_card = {rank = nil, enhancement = nil, id = nil},
 '''
 
 [[patches]]  
@@ -38,6 +39,7 @@ match_indent = true
 payload = '''
 jest_legendary_pool = {in_shop = false, rate = 0.99},
 jest_stored_memory_card = nil,
+jest_change_booster_options = {op = {add = 0, mult = 0, div = 0, sub = 0}, trigger = false, option = ""}, -- both, pick, or size
 '''
 
 [[patches]] #Colors

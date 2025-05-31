@@ -1,7 +1,7 @@
 local corpse_paint = {
     object_type = "Joker",
     order = 212,
-    ignore = true,
+    
     key = "corpse_paint",
     config = {
       odds = 3,
@@ -37,5 +37,16 @@ local corpse_paint = {
             end
         end
     end,
+
+    in_pool = function(self, args)
+        if G.GAME and G.playing_cards then
+            for _, card in ipairs(G.playing_cards) do
+                if card.edition and card.edition.negative then
+                    return true
+                end
+            end
+        end
+        return false
+    end
 }
 return { name = {"Jokers"}, items = {corpse_paint} }

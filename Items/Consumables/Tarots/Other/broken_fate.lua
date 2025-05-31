@@ -1,7 +1,8 @@
 local broken_fate = {
     object_type = "Consumable",
 	key = 'broken_fate',
-   ignore = true,
+  ignore = true,
+   
 	set = 'Tarot',
 	pos = { x = 6, y = 5 },
 	cost = 3,

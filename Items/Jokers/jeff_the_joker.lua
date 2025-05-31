@@ -5,7 +5,8 @@ local jeff_the_joker = {
   key = "jeff_the_joker",
   config = {
       extra = {
-          x_mult = 1 
+          x_mult = 1,
+          x_mult_per_destroy = 0.5,
       }
   },
   rarity = 2,
@@ -20,14 +21,13 @@ local jeff_the_joker = {
   loc_vars = function(self, info_queue, card)
       -- Display the current multiplier stored in the card's ability table
       local current_xmult = card.ability.extra.x_mult or 1
-      return { vars = { current_xmult } }
+      return { vars = { current_xmult, card.ability.extra.x_mult_per_destroy } }
   end,
 
   calculate = function(self, card, context)
       -- Effect Trigger: Selecting the Small Blind
-      if not context.blueprint and context.setting_blind and context.blind.name == 'Small Blind' then
+      if not context.blueprint and context.setting_blind and context.blind.name == "Small Blind" then
           local destroyed_count = 0
-          card.ability.extra.x_mult = 1 
 
           local jokers_to_check = {}
           if G.jokers and G.jokers.cards then
@@ -37,7 +37,7 @@ local jeff_the_joker = {
           end
 
           for _, v in ipairs(jokers_to_check) do
-              if v ~= card and not v.ability.eternal then
+              if v ~= card and not v.ability.eternal and v.config.center_key ~= "j_aij_jeff_the_joker" then
                   destroyed_count = destroyed_count + 1
                   v:start_dissolve() 
                   G.E_MANAGER:add_event(Event({
@@ -51,7 +51,7 @@ local jeff_the_joker = {
           end
 
           if destroyed_count > 0 then
-              card.ability.extra.x_mult = 1 + (destroyed_count * 0.5)
+              card.ability.extra.x_mult = card.ability.extra.x_mult + (destroyed_count * card.ability.extra.x_mult_per_destroy)
               card_eval_status_text(card, 'extra', nil, nil, nil, {message = 'X'..card.ability.extra.x_mult..' Mult', colour = G.C.RED})
               card:juice_up(0.6, 0.6)
           end

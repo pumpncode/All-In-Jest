@@ -1,12 +1,12 @@
 local slim_joker = {
     object_type = "Joker",
     order = 51,
-     ignore = true,
+     
     key = "slim_joker",
     config = {
       extra = {
-        initial_mult = 30,
-        mult_mod = 5
+        initial_mult = 24,
+        mult_mod = 4
       }
     },
     rarity = 1,

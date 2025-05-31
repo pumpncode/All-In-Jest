@@ -4,7 +4,7 @@ local two_ways = {
 	set = 'Tarot',
 	pos = { x = 5, y = 6 },
 	cost = 3,
-     ignore = true,
+    
 	unlocked = true,
 	discovered = false,
 	order = 5,
@@ -40,7 +40,6 @@ local two_ways = {
             end
             _card:set_base(G.P_CARDS[_suit..rank_suffix])
             hand_card:set_base(G.P_CARDS[_suit..hand_card_rs])
-            _card:set_sigil(nil, index)
             _card:add_to_deck()
             G.deck.config.card_limit = G.deck.config.card_limit + 1
             table.insert(G.playing_cards, _card)
@@ -50,6 +49,7 @@ local two_ways = {
             G.E_MANAGER:add_event(Event({
                 func = function()
                     _card:start_materialize()
+                    playing_card_joker_effects({_card})
                     return true
                 end
             })) 
