@@ -102,7 +102,7 @@ return {
                 text = {
                     "Turn every scored {C:attention}#1#{}",
                     "into a {C:attention}#2#{}",
-                    "{s:0.8}rank and enhancement",
+                    "{s:0.8}Rank and Enhancement",
                     "{s:0.8}change at end of round"
                 },
             },
@@ -167,7 +167,7 @@ return {
             j_aij_trypophobia = {
                 name = "Trypophobia",
                 text = {
-                    "{C:mult}+#1#{} Mult if played hand",
+                    "{C:mult}+#1#{} Mult if scored hand",
                     "contains only {C:attention}8s{}",
                 },
             },
@@ -387,7 +387,7 @@ return {
                 text = {
                     "{C:attention}After{} {C:attention}Jokers{} have triggered,",
                     "set {C:mult}Mult{} to the {C:attention}highest",
-                    "{C:mult}Mult{} reached this round",
+                    "{C:mult}Mult{} reached this {C:attention}Ante",
                     "{C:inactive}(Currently {C:mult}#1# {C:inactive}Mult)"
                 } 
             },
@@ -876,10 +876,11 @@ return {
             j_aij_fatuus = {
                 name = "Fatuus",
                 text = {
-                    'If played hand contains',
-                    'only {C:attention}Kings{} and {C:attention}Queens{},',
-                    'apply a {C:blue}Blue Seal{} to a',
-                    'random card held in hand',
+                    'If first played hand of',
+                    'round contains only {C:attention}Kings{}',
+                    'and {C:attention}Queens{}, apply a {C:blue}Blue',
+                    '{C:blue}Seal{} to a random played',
+                    'card',
                 },
             },
             j_aij_enraging_photo = { name = "Enraging Photo", text = { "" } },
@@ -1580,8 +1581,7 @@ return {
                 name = "Fantasio", 
                 text = { 
                     "All cards are considered",
-                    "{C:hearts}Hearts{}, {C:spades}Spades{},",
-                    "{C:diamonds}Diamonds{}, and {C:clubs}Clubs{}" 
+                    "to be {C:attention}every suit",
                 }, 
                 unlock = { 
                     "?????" 
