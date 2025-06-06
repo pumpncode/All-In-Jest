@@ -1893,7 +1893,7 @@ return {
             c_aij_shade = {
                 name = 'Shade',
                 text = {
-                    'Add {C:dark_edition}Negative{} edtion',
+                    'Add {C:dark_edition}Negative{} edition',
                     'to {C:attention}1{} random',
                     'card in hand'
                 }

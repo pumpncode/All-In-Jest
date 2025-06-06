@@ -26,6 +26,11 @@ local function patch_text(txt)
         )
 
         txt = txt:gsub(
+            "([%w_.#]+):get_id%(%s*%)%s*" .. esc .. "%s*([%w_.#]+%b[][%w_.#]*)",
+            "ids_op(%1, \"" .. op .. "\", %2)"
+        )
+
+        txt = txt:gsub(
             "([%w_.#]+):get_id%(%s*%)%s*" .. esc .. "%s*([%w_.#]+)",
             "ids_op(%1, \"" .. op .. "\", %2)"
         )
@@ -183,6 +188,11 @@ local function patch_text(txt)
         txt = txt:gsub(
             "([%w_.#]+):get_id%(%s*%)%s*" .. esc .. "%s*([%w_.#]+):get_id%(%s*%)",
             "ids_op(%1, \"" .. op .. "\", %2:get_id())"
+        )
+
+        txt = txt:gsub(
+            "([%w_.#]+):get_id%(%s*%)%s*" .. esc .. "%s*([%w_.#]+%b[][%w_.#]*)",
+            "ids_op(%1, \"" .. op .. "\", %2)"
         )
 
         txt = txt:gsub(
