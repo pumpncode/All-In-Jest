@@ -363,8 +363,9 @@ return {
             j_aij_anchor = { 
                 name = "Anchor", 
                 text = { 
-                    "Adjacent Jokers",
-                    "{C:attention}cannot be {C:red}destroyed" 
+                    "This Joker and",
+                    "Adjacent Jokers {C:attention}cannot{} be",
+                    "{C:attention}be {C:red}destroyed" 
                 } 
             },
             j_aij_hei_tiki = { 
@@ -1901,9 +1902,10 @@ return {
             c_aij_trefle = {
                 name = 'Trèfle',
                 text = {
-                    '{C:attention}Reroll{} one of your',
-                    'highest rarity {C:attention}Jokers',
-                    "{C:inactive}(Cannot be eternal){}"
+                    '{C:attention}Reroll{} one',
+                    'selected {C:attention}Joker',
+                    "{C:inactive}(Cannot be{}",
+                    "{C:inactive}eternal){}"
                 }
             },
         },
