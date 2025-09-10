@@ -27,8 +27,6 @@ local trefle_spectral = {
     use = function(self, card, area, copier)
       
         local victim_joker = G.jokers.highlighted[1]
-
-
       
         local victim_rarity = victim_joker.config.center.rarity or 1
         local is_legendary = victim_rarity == 4
@@ -96,7 +94,18 @@ local trefle_spectral = {
                     else
                         G.jokers:emplace(new_joker)
                     end
+                    for k, v in pairs(G.shared_stickers) do
+                        if victim_joker.ability[k] then
+                            new_joker.ability[k] = true
+                            -- ensure perish_tally is initialized correctly
+                            if k == "perishable" and new_joker.ability.perish_tally == nil then
+                                new_joker.ability.perish_tally = G.GAME.perishable_rounds or 5
+                            end
+                        end
+                    end
+                    
                     new_joker:start_materialize({ G.C.SPECTRAL, G.C.WHITE })
+                    new_joker:set_edition(victim_joker.edition)
                 end
 
                 card:juice_up(0.5, 0.5)

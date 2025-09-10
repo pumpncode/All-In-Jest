@@ -1,6 +1,7 @@
 local event_horizon = {
   object_type = "Joker",
   order = 169,
+  ignore = true,
   key = "event_horizon",
   config = {
     
@@ -15,6 +16,12 @@ local event_horizon = {
   eternal_compat = true,
 
   add_to_deck = function(self, card, from_debuff)
+    SMODS.Consumable:take_ownership("black_hole", {
+      discovered = false,
+      hidden = false
+    })
+  end,
+  loc_vars = function(self, info_queue, card)
     
   end,
 

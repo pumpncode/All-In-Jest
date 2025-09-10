@@ -5,7 +5,7 @@ local egg_cc = {
     key = "egg_cc",
     config = {
       extra = {
-        chips = 9,
+        chips = 0,
         chip_mod = 9,
         sell_value = 2
       }
@@ -18,6 +18,9 @@ local egg_cc = {
     discovered = false,
     blueprint_compat = true,
     eternal_compat = true,
+    pools = {
+        Food = true
+    },
   
     loc_vars = function(self, info_queue, card)
       return {

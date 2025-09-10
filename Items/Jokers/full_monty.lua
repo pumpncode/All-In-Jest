@@ -6,7 +6,7 @@ local full_monty = {
     config = {
     },
     rarity = 1,
-    pos = { x = 0, y = 13},
+    pos = { x = 1, y = 13},
     atlas = 'joker_atlas',
     cost = 4,
     unlocked = true,

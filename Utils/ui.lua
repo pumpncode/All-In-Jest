@@ -5,6 +5,22 @@ SMODS.current_mod.config_tab = function()
     nodes = {
       {
         n = G.UIT.R,
+        config = { align = 'cm'},
+        nodes = {
+          {
+            n = G.UIT.C,
+            nodes = {
+              create_toggle {
+                label = localize('aij_no_copy_neg'),
+                ref_table = All_in_Jest.config,
+                ref_value = 'no_copy_neg'
+              },
+            },
+          },
+        }
+      },
+      {
+        n = G.UIT.R,
         config = { align = 'cm', minh = 1 },
         nodes = {
           { n = G.UIT.T, config = { text = localize('aij_requires_restart'), colour = G.C.RED, scale = 0.5 } }
@@ -21,13 +37,98 @@ SMODS.current_mod.config_tab = function()
                 ref_table = All_in_Jest.config,
                 ref_value = 'moons_enabled'
               },
+            },
           },
+          {
+            n = G.UIT.C,
+            nodes = {
+              create_toggle {
+                label = localize('aij_alter_trypophobia'),
+                ref_table = All_in_Jest.config,
+                ref_value = 'alter_trypophobia'
+              },
+            },
+          }
         }
-      }
-    }
+      },
     }
   }
 end
+G.FUNCS.jest_free_reroll_boss = function(e) 
+    stop_use()
+    if G.GAME.jest_free_stultor_rerolls == 0 then
+        G.GAME.round_resets.boss_rerolled = true
+        if not G.from_boss_tag then ease_dollars(-10) end
+    end
+    G.from_boss_tag = nil
+    G.CONTROLLER.locks.boss_reroll = true
+    G.E_MANAGER:add_event(Event({
+        trigger = 'immediate',
+        func = function()
+          play_sound('other1')
+          G.blind_select_opts.boss:set_role({xy_bond = 'Weak'})
+          G.blind_select_opts.boss.alignment.offset.y = 20
+          return true
+        end
+      }))
+    G.E_MANAGER:add_event(Event({
+      trigger = 'after',
+      delay = 0.3,
+      func = (function()
+        local par = G.blind_select_opts.boss.parent
+        G.GAME.round_resets.blind_choices.Boss = get_new_boss()
+        G.GAME.jest_free_stultor_rerolls = G.GAME.jest_free_stultor_rerolls - 1
+
+        G.blind_select_opts.boss:remove()
+        G.blind_select_opts.boss = UIBox{
+          T = {par.T.x, 0, 0, 0, },
+          definition =
+            {n=G.UIT.ROOT, config={align = "cm", colour = G.C.CLEAR}, nodes={
+              UIBox_dyn_container({create_UIBox_blind_choice('Boss')},false,get_blind_main_colour('Boss'), mix_colours(G.C.BLACK, get_blind_main_colour('Boss'), 0.8))
+            }},
+          config = {align="bmi",
+                    offset = {x=0,y=G.ROOM.T.y + 9},
+                    major = par,
+                    xy_bond = 'Weak'
+                  }
+        }
+        par.config.object = G.blind_select_opts.boss
+        par.config.object:recalculate()
+        G.blind_select_opts.boss.parent = par
+        G.blind_select_opts.boss.alignment.offset.y = 0
+        
+        G.E_MANAGER:add_event(Event({blocking = false, trigger = 'after', delay = 0.5,func = function()
+            G.CONTROLLER.locks.boss_reroll = nil
+            return true
+          end
+        }))
+
+        save_run()
+        for i = 1, #G.GAME.tags do
+          if G.GAME.tags[i]:apply_to_run({type = 'new_blind_choice'}) then break end
+        end
+          return true
+      end)
+    }))
+  end
+G.FUNCS.jest_free_reroll_boss_button = function(e)
+    if G.GAME.jest_free_stultor_rerolls > 0 then 
+        e.config.text = localize('$')..'0'
+        e.config.colour = G.C.RED
+        e.config.button = 'jest_free_reroll_boss'
+        e.children[1].children[1].config.shadow = true
+        if e.children[2] then e.children[2].children[1].config.shadow = true end 
+    else
+        e.config.text = localize('$')..'10'
+        G.FUNCS.reroll_boss_button(e)
+    end
+    if G.blind_prompt_box ~= nil and G.blind_prompt_box.definition.nodes[3] ~= nil then
+        if e.config.text ~= G.blind_prompt_box.definition.nodes[3].nodes[1].nodes[2].nodes[1].config.text then
+            G.blind_prompt_box.definition.nodes[3].nodes[1].nodes[2].nodes[1].config.text = e.config.text
+            G.blind_prompt_box.definition.nodes[3].nodes[1].nodes[2].config.button_UIE.UIBox:recalculate()
+        end
+    end
+  end
 SMODS.jest_no_back_card_collection_UIBox = function(_pool, rows, args)
     args = args or {}
     args.w_mod = args.w_mod or 1
@@ -100,23 +201,100 @@ G.FUNCS.jest_select = function(e)
     if c1 and c1:is(Card) then
       G.E_MANAGER:add_event(Event({
         trigger = 'after',
-        delay = 0.1,
         func = function()
-          local card = copy_card(c1)
-          card:add_to_deck()
-          e.config.data[1]:emplace(card)
           G.SETTINGS.paused = false
           if G.OVERLAY_MENU ~= nil then
               G.OVERLAY_MENU:remove()
               G.OVERLAY_MENU = nil
           end
+          SMODS.add_card {
+            key = c1.config.center_key,
+            area = e.config.data[1]
+          }
           return true
         end
       }))
     end
 end
-function jest_create_select_card_ui(card, area)
-    local t2 =  {n=G.UIT.ROOT, config = {ref_table = card, minw = 0.6, maxw = 1, padding = 0.1, align = 'bm', colour = G.C.GREEN, shadow = true, r = 0.08, minh = 0.3, one_press = true, button = 'jest_select', data = {area}, hover = true}, nodes={
+G.FUNCS.jest_continue_select = function(e)
+    local c1 = e.config.ref_table
+    if c1 and c1:is(Card) then
+      G.E_MANAGER:add_event(Event({
+        trigger = 'after',
+        func = function()
+          if e.config.data[2].following == 0 then
+            G.FUNCS.jest_select(e)
+            return true
+          end
+          e.config.data[2].following = e.config.data[2].following - 1
+          e.config.data[2].times = e.config.data[2].times + 1
+          if G.OVERLAY_MENU ~= nil then
+              G.OVERLAY_MENU:remove()
+              G.OVERLAY_MENU = nil
+          end
+          e.config.data[2].cards = e.config.data[2].cards or {}
+          table.insert(e.config.data[2].cards, c1)
+          G.FUNCS.overlay_menu{
+                config = {no_esc = true}, 
+                definition = SMODS.jest_no_back_card_collection_UIBox(
+                    e.config.data[2].pools[e.config.data[2].times], 
+                    {e.config.data[2].size.x[e.config.data[2].times],e.config.data[2].size.y[e.config.data[2].times]}, 
+                    {
+                        no_materialize = true, 
+                        hide_single_page = true,
+                        collapse_single_page = true,
+                        center = e.config.data[2].center,
+                        modify_card = function(card, center) 
+                            local conditionals = true
+                            if e.config.data[2].conditionals then
+                                conditionals = e.config.data[2].conditionals[e.config.data[2].times] or true
+                            end
+                            if e.config.data[2].extra_function then
+                                e.config.data[2].extra_function(card, center, c1, e.config.data[2])
+                            end
+                            if conditionals then
+                                jest_create_select_playing_card_ui(card, e.config.data[1], e.config.data[2])
+                            end
+                        end, 
+                        h_mod = 1.05,
+                    }
+                ),
+          }
+          
+          return true
+        end
+      }))
+    end
+end
+G.FUNCS.jest_gold_tags = function(e)
+    if G.GAME.jest_upgrade_tab then
+        G.GAME.jest_upgrade_tab = false
+    else
+        G.GAME.jest_upgrade_tab = true
+    end
+end
+function jest_create_select_card_ui(card, area, extra_data)
+    extra_data = extra_data or {}
+    extra_data.copies = extra_data.copies or 1 
+    local t2 =  {n=G.UIT.ROOT, config = {ref_table = card, minw = 0.6, maxw = 1, padding = 0.1, align = 'bm', colour = G.C.GREEN, shadow = true, r = 0.08, minh = 0.3, one_press = true, button = 'jest_select', data = {area, extra_data}, hover = true}, nodes={
+        {n=G.UIT.T, config={text = "Select",colour = G.C.WHITE, scale = 0.5}}
+    }}
+
+    card.children.select_button = UIBox{
+        definition = t2,
+        config = {
+            align="bm",
+            offset = {x=-0,y=-0.15},
+            major = card,
+            bond = 'Weak',
+            parent = card
+        }
+    }
+end
+function jest_create_select_playing_card_ui(card, area, extra_data)
+    extra_data.times = extra_data.times or 0
+    extra_data.copies = extra_data.copies or 1 
+    local t2 =  {n=G.UIT.ROOT, config = {ref_table = card, minw = 0.6, maxw = 1, padding = 0.1, align = 'bm', colour = G.C.GREEN, shadow = true, r = 0.08, minh = 0.3, one_press = true, button = 'jest_continue_select', data = {area, extra_data}, hover = true}, nodes={
         {n=G.UIT.T, config={text = "Select",colour = G.C.WHITE, scale = 0.5}}
     }}
 
