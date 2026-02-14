@@ -1,7 +1,7 @@
 local line_in_the_sand = {
     object_type = "Joker",
     order = 81,
-    
+    lite = true,
     key = "line_in_the_sand",
     config = {
       
@@ -20,9 +20,12 @@ local line_in_the_sand = {
     end,
 
     remove_from_deck = function(self, card, from_debuff)
-        local discard_count = #G.jest_super_discard.cards
-        for i=1, discard_count do 
-            draw_card(G.jest_super_discard, G.discard, i*100/discard_count,'up', nil ,nil, 0.005, i%2==0, nil, math.max((21-i)/20,0.7))
+        local has_line_in_the_sand = next(SMODS.find_card("j_aij_line_in_the_sand"))
+        if not has_line_in_the_sand then
+            local discard_count = #G.jest_super_discard.cards
+            for i=1, discard_count do 
+                draw_card(G.jest_super_discard, G.discard, i*100/discard_count,'up', nil ,nil, 0.005, i%2==0, nil, math.max((21-i)/20,0.7))
+            end
         end
     end,
 }

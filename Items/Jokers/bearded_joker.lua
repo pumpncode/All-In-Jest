@@ -1,11 +1,11 @@
 local bearded_joker = {
     object_type = "Joker",
     order = 208,
-
+    lite = true,
     key = "bearded_joker",
     config = {
       extra = {
-        mult_mod = 1,
+        mult_mod = 2,
       }
     },
     rarity = 1,
@@ -22,14 +22,14 @@ local bearded_joker = {
         if G.GAME and G.playing_cards then
             for _, card in ipairs(G.playing_cards) do
                 if card.config.center ~= G.P_CENTERS.c_base then
-                 enhancement_tally = enhancement_tally + 1
+                   enhancement_tally = enhancement_tally + 1
                 end
             end
         end
         return {
             vars = {
                 card.ability.extra.mult_mod,
-                enhancement_tally * card.ability.extra.mult_mod,
+                card.ability.extra.mult_mod * enhancement_tally,
             }
         }
     end,

@@ -16,11 +16,16 @@ local magic_mirror = {
     eternal_compat = true,
   
     loc_vars = function(self, info_queue, card)
-        local active_text = "(Inactive)"
-        if G.GAME.jest_magic_mirror_trigger then 
-            active_text = "(Active!)"
+        if All_in_Jest.config and All_in_Jest.config.no_copy_neg then
+            info_queue[#info_queue+1] = {key = 'e_negative_playing_card', set = 'Edition', config = {extra = G.P_CENTERS['e_negative'].config.card_limit} }
         else
-            active_text = "(Inactive)"
+            info_queue[#info_queue+1] = G.P_CENTERS.e_aij_negative_playing_card
+        end
+        local active_text = "("..localize('k_inactive')..")"
+        if G.GAME.jest_magic_mirror_trigger then 
+            active_text = "("..localize('k_active')..")"
+        else
+            active_text = "("..localize('k_inactive')..")"
         end
         return { vars = {
             active_text
@@ -28,14 +33,17 @@ local magic_mirror = {
     end,
   
     calculate = function(self, card, context)
-      if context.individual and context.cardarea == G.play then
+      if context.ante_change and context.ante_change ~= 0 and context.ante_end then
+          G.GAME.jest_magic_mirror_trigger = true
+      end
+      if context.individual and context.cardarea == G.play and not context.blueprint then
         if G.GAME.jest_magic_mirror_trigger then
             local cardd = context.other_card
             if cardd:is_face() then
                 G.GAME.jest_magic_mirror_trigger = false
                  G.E_MANAGER:add_event(Event({
-                trigger = 'before', -- 'before' is good for effects during scoring
-                delay = 0.2,      -- A small delay to let other effects resolve first
+                trigger = 'before',
+                delay = 0.2,      
                 func = function()
                     card:juice_up(0.6, 0.2)
                     cardd:juice_up(0.6, 0.2)
@@ -50,13 +58,4 @@ local magic_mirror = {
     end
   
 }
-local ease_anteref = ease_ante
-function ease_ante(mod)
-    if mod ~= 0 then
-        G.GAME.jest_magic_mirror_trigger = true
-    end
-    
-    local ref = ease_anteref(mod)
-    return ref
-end
 return { name = {"Jokers"}, items = {magic_mirror} }

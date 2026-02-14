@@ -1,7 +1,7 @@
 local thomazina = {
     object_type = "Joker",
     order = 1024,
-
+    lite = true,
     key = "thomazina",
     config = {
       chips = 0,
@@ -32,10 +32,13 @@ local thomazina = {
       if context.individual and context.cardarea == G.play then
         if not context.other_card:is_face() and not context.other_card.no_rank then
           if not context.blueprint then
-            card.ability.chips = card.ability.chips + card.ability.chip_mod
+            SMODS.scale_card(card, {
+	            ref_table = card.ability,
+                ref_value = "chips",
+	            scalar_value = "chip_mod",
+            })
           end
           return {
-            extra = not context.blueprint and {focus = card, message = localize('k_upgrade_ex')},
             chips = card.ability.chips,
           }
         end

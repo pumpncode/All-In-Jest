@@ -1,10 +1,11 @@
 local mondrian_joker = {
     object_type = "Joker",
     order = 214,
-
+    lite = true,
     key = "mondrian_joker",
     config = {
       extra = {
+        mult = 0,
         mult_mod = 4
       }
     },
@@ -26,7 +27,8 @@ local mondrian_joker = {
                 end
             end
         end
-        local current_mult = four_count * card.ability.extra.mult_mod
+        card.ability.extra.mult = four_count * card.ability.extra.mult_mod
+        local current_mult = card.ability.extra.mult
         return { vars = {card.ability.extra.mult_mod, current_mult} }
     end,
   
@@ -41,7 +43,8 @@ local mondrian_joker = {
               end
           end
 
-          local total_mult = four_count * card.ability.extra.mult_mod
+          card.ability.extra.mult = four_count * card.ability.extra.mult_mod
+          local total_mult = card.ability.extra.mult
 
           if total_mult > 0 then
               return {

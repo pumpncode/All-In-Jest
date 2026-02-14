@@ -1,27 +1,62 @@
 local mute_joker = {
     object_type = "Joker",
     order = 105,
-    ignore = true,
 
     key = "mute_joker",
     config = {
-      
+      extra = {
+          poker_hand = "(hand)",
+          trigger = false
+      }
     },
-    rarity = 1,
+    rarity = 2,
     pos = { x = 0, y = 4 },
     atlas = 'joker_atlas',
-    cost = 4,
+    cost = 6,
     unlocked = true,
     discovered = false,
     blueprint_compat = false,
-    eternal_compat = false,
+    eternal_compat = true,
   
     loc_vars = function(self, info_queue, card)
-  
+        if G.jokers and card.ability.extra.poker_hand == "(hand)" then
+            local _poker_hands = {}
+            for k, v in pairs(G.GAME.hands) do
+                if SMODS.is_poker_hand_visible(k) and k ~= card.ability.extra.poker_hand then _poker_hands[#_poker_hands + 1] = k end
+            end
+            card.ability.extra.poker_hand = pseudorandom_element(_poker_hands, pseudoseed('mute_joker'))
+            card.ability.extra.trigger = false
+        end
+        return {
+            vars = {
+                card.ability.extra.poker_hand,
+            }
+        }
     end,
-  
+
     calculate = function(self, card, context)
-      
+        local contexts = not context.individual and not context.repetition
+        if context.end_of_round and contexts and not context.blueprint then
+            local _poker_hands = {}
+            for k, v in pairs(G.GAME.hands) do
+                if SMODS.is_poker_hand_visible(k) and k ~= card.ability.extra.poker_hand then _poker_hands[#_poker_hands + 1] = k end
+            end
+            card.ability.extra.poker_hand = pseudorandom_element(_poker_hands, pseudoseed('mute_joker'))
+            card.ability.extra.trigger = false
+            return {
+                message = localize('k_reset')
+            }
+        end
+        if context.after and context.scoring_hand and not card.ability.extra.trigger and card.ability.extra.poker_hand ~= "(hand)" and not context.blueprint then
+            if context.scoring_name == card.ability.extra.poker_hand then
+                local total_cards = {}
+                for i = 1, #context.scoring_hand do
+                    table.insert(total_cards, context.scoring_hand[i])
+                end
+                SMODS.destroy_cards(total_cards)
+                card.ability.extra.trigger = true
+            end
+        end
     end
   
 }

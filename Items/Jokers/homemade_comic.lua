@@ -6,10 +6,10 @@ local homemade_comic = {
     config = {
        xmult = 1.5
     },
-    rarity = 1,
+    rarity = 2,
     pos = { x = 20, y = 11},
     atlas = 'joker_atlas',
-    cost = 4,
+    cost = 7,
     unlocked = true,
     discovered = false,
     blueprint_compat = true,
@@ -37,7 +37,6 @@ local homemade_comic = {
         if context.individual and context.cardarea == G.play then
             if context.other_card.config.center == G.P_CENTERS["m_aij_charged"] then
                 return {
-                  card = context.other_card,
                   xmult = card.ability.xmult,
                 }
             end

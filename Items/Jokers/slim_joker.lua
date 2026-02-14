@@ -31,7 +31,8 @@ local slim_joker = {
   
     calculate = function(self, card, context)
         if context.joker_main then
-            local _mult = card.ability.extra.initial_mult - card.ability.extra.mult_mod * #context.full_hand
+            local _mult = 0
+            _mult = card.ability.extra.initial_mult - card.ability.extra.mult_mod * #context.full_hand
             if _mult > 0 then 
                 return {
                     mult = _mult

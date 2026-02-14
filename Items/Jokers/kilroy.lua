@@ -1,10 +1,18 @@
+local function round_hundredth(x)
+    if x >= 0 then
+        return math.floor(x * 100 + 0.5) / 100
+    else
+        return math.ceil(x * 100 - 0.5) / 100
+    end
+end
+
 local kilroy = {
     object_type = "Joker",
     order = 132,
 
     key = "kilroy",
     config = {
-      extra = {modchips = 50, curchips = 0}
+        silver_multiplier_buff = 100, -- Make 100 instead of 1 to keep 2 decimals of precision
     },
     rarity = 1,
     pos = { x = 1, y = 5 },
@@ -12,31 +20,35 @@ local kilroy = {
     cost = 4,
     unlocked = true,
     discovered = false,
-    blueprint_compat = false,
+    blueprint_compat = true,
     eternal_compat = false,
   
     loc_vars = function(self, info_queue, card)
-        card.ability.extra.curchips = card.ability.extra.modchips * G.GAME.jest_kilroy_sold
-        return { vars = {card.ability.extra.modchips, card.ability.extra.curchips}}
+        return { vars = {round_hundredth(G.GAME.all_in_jest.jest_kilroy_curvalue * card.ability.silver_multiplier_buff / 100)}}
     end,
   
     calculate = function(self, card, context)
+
+        if context.selling_card and not context.blueprint then
+            if (context.card == card) then
+                SMODS.scale_card(card, {
+                    ref_table = G.GAME.all_in_jest,
+                    ref_value = "jest_kilroy_curvalue",
+                    scalar_table = {scale = 2},
+                    operation = "X",
+                    scalar_value = "scale",
+                    -- no_message = true,
+                })
+            end
+        end
+
         if context.joker_main then
-            card.ability.extra.curchips = card.ability.extra.modchips * G.GAME.jest_kilroy_sold
-            if card.ability.extra.curchips ~= 0 then
+            if round_hundredth(G.GAME.all_in_jest.jest_kilroy_curvalue * card.ability.silver_multiplier_buff / 100) > 0 then
                 return {
-                  chips = card.ability.extra.curchips,
+                  chips = round_hundredth(G.GAME.all_in_jest.jest_kilroy_curvalue * card.ability.silver_multiplier_buff / 100),
                 }
             end
         end
     end
 }
-local sell_card_ref = Card.sell_card
-function Card:sell_card()
-  local ref = sell_card_ref(self)
-  if self.config.center_key == "j_aij_kilroy" then
-    G.GAME.jest_kilroy_sold = G.GAME.jest_kilroy_sold + 1
-  end
-  return ref
-end
 return { name = {"Jokers"}, items = {kilroy} }

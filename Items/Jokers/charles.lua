@@ -33,15 +33,16 @@ local charles = {
     if context.before then
       for k, v in ipairs(context.full_hand) do
         all_cards = all_cards + 1
-        if v:get_id() == 13 and v:is_suit('Hearts') then
+        if v:get_id() == 13 and v:is_suit('Hearts', false, true) then
           heart_kings = heart_kings + 1
         end
       end
      if heart_kings == all_cards and not context.blueprint then 
-        card.ability.extra.xmult = card.ability.extra.xmult + card.ability.extra.xmult_mod
-        return {
-          message = localize('k_upgrade_ex')
-        }
+        SMODS.scale_card(card, {
+	        ref_table = card.ability.extra,
+            ref_value = "xmult",
+	        scalar_value = "xmult_mod",
+        })
       end
     end
     if context.joker_main then

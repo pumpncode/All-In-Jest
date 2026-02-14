@@ -4,7 +4,7 @@ local corpse_paint = {
     
     key = "corpse_paint",
     config = {
-      odds = 3,
+      odds = 2,
       hand_size = 1,
       max_hand_size = "0"
     },
@@ -18,7 +18,13 @@ local corpse_paint = {
     eternal_compat = true,
   
     loc_vars = function(self, info_queue, card)
-        return { vars = { card.ability.odds, G.GAME.probabilities.normal or 1, card.ability.hand_size, card.ability.max_hand_size }}
+        if All_in_Jest.config and All_in_Jest.config.no_copy_neg then
+            info_queue[#info_queue+1] = {key = 'e_negative_playing_card', set = 'Edition', config = {extra = G.P_CENTERS['e_negative'].config.card_limit} }
+        else
+            info_queue[#info_queue+1] = G.P_CENTERS.e_aij_negative_playing_card
+        end
+        local numerator, denominator = SMODS.get_probability_vars(card, 1, card.ability.odds)
+        return { vars = { numerator, denominator, card.ability.hand_size, card.ability.max_hand_size }}
     end,
 
     remove_from_deck = function(self, card, from_debuff)
@@ -26,13 +32,21 @@ local corpse_paint = {
     end,
   
     calculate = function(self, card, context)
-        if context.individual and context.cardarea == G.play then
+        if context.individual and context.cardarea == G.play and not context.blueprint then
             if context.other_card.edition ~= nil and context.other_card.edition.negative then
                 context.other_card:set_edition(nil)
-                if pseudorandom('corpse_paint') < G.GAME.probabilities.normal/card.ability.odds then
+                if SMODS.pseudorandom_probability(card, 'corpse_paint', 1, card.ability.odds) then
                     G.hand:change_size(card.ability.hand_size)
-                    card_eval_status_text(card, 'extra', nil, nil, nil, {message = "+"..card.ability.hand_size.." Hand size", colour = G.C.FILTER})
-                    card.ability.max_hand_size = tostring(tonumber(card.ability.max_hand_size) + card.ability.hand_size)
+                    local hand_size = tonumber(card.ability.max_hand_size)
+                    SMODS.scale_card(card, {
+	                    ref_table = card.ability,
+                        ref_value = "max_hand_size",
+	                    scalar_value = "hand_size",
+                        operation = function(ref_table, ref_value, initial, change)
+	                        ref_table[ref_value] = tostring(tonumber(initial) + change)
+                        end,
+                        message_key = 'a_handsize'
+                    })
                 end
             end
         end

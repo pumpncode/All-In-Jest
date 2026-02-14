@@ -33,15 +33,16 @@ local david = {
       if context.before then
         for k, v in ipairs(context.full_hand) do
           all_cards = all_cards + 1
-          if v:get_id() == 13 and v:is_suit('Spades') then
+          if v:get_id() == 13 and v:is_suit('Spades', false, true) then
             spade_kings = spade_kings + 1
           end
         end
        if spade_kings == all_cards and not context.blueprint then 
-          card.ability.extra.chips = card.ability.extra.chips + card.ability.extra.chip_mod
-          return {
-            message = localize('k_upgrade_ex')
-          }
+          SMODS.scale_card(card, {
+	        ref_table = card.ability.extra,
+            ref_value = "chips",
+	        scalar_value = "chip_mod",
+          })
         end
       end
       if context.joker_main then

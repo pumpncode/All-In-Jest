@@ -1,34 +1,59 @@
 local doodle = {
-    object_type = "Joker",
-    order = 27,
+  object_type = "Joker",
+  order = 27,
 
-    key = "doodle",
-    config = {
-      extra = {
-        odds = 2
+  key = "doodle",
+  config = {
+    extra = {
+      odds = 2,
+      should_activate = false
+    }
+  },
+  rarity = 3,
+  pos = { x = 24, y = 0 },
+  atlas = 'joker_atlas',
+  cost = 10,
+  unlocked = true,
+  discovered = false,
+  blueprint_compat = true,
+  eternal_compat = true,
+
+  loc_vars = function(self, info_queue, card)
+    local active_text = ""
+    local numerator, denominator = SMODS.get_probability_vars(card, 1, card.ability.extra.odds, 'doodle')
+    if card.ability.extra.should_activate then
+      active_text = "(" .. localize('k_active') .. ")"
+    else
+      active_text = "(" .. localize('k_inactive') .. ")"
+    end
+    return {
+      vars = {
+        numerator, denominator,
+        active_text,
       }
-    },
-    rarity = 3,
-    pos = { x = 24, y = 0 },
-    atlas = 'joker_atlas',
-    cost = 10,
-    unlocked = true,
-    discovered = false,
-    blueprint_compat = false,
-    eternal_compat = true,
-  
-    loc_vars = function(self, info_queue, card)
-      return { vars = { 
-        ''..(G.GAME and G.GAME.probabilities.normal or 1),
-        card.ability.extra.odds
-      } }
-    end,
+    }
+  end,
   --thank you unstable
   calculate = function(self, card, context)
-    if card.is_doodle_calculating then
-        return nil, true
+    if context.setting_blind and not context.blueprint then
+      if SMODS.pseudorandom_probability(card, 'doodle', 1, card.ability.extra.odds) then
+        card.ability.extra.should_activate = true
+        return {
+          message = localize('k_active'),
+          colour = G.C.GREEN
+        }
+      else
+        card.ability.extra.should_activate = false
+        return {
+          message = localize('k_inactive'),
+          colour = G.C.RED
+        }
+      end
     end
-    card.is_doodle_calculating = true 
+    if card.is_doodle_calculating then
+      return
+    end
+    card.is_doodle_calculating = true
 
     local my_index = nil
     for i, joker_in_area in ipairs(G.jokers.cards) do
@@ -59,41 +84,36 @@ local doodle = {
     if target_joker2 == card then target_joker2 = nil end
 
     local effect_to_return = nil
-    local did_probability_pass = false 
+    local did_probability_pass = false
 
-    if pseudorandom('doodle' .. G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds then
-      did_probability_pass = true 
+    if card.ability.extra.should_activate then
+      did_probability_pass = true
 
       local effect1_def
       if target_joker1 then
         effect1_def = SMODS.blueprint_effect(card, target_joker1, context)
       end
- 
+
       local effect2_def
       if target_joker2 then
         effect2_def = SMODS.blueprint_effect(card, target_joker2, context)
       end
- 
-      if effect1_def then
-        if effect2_def then
-          effect1_def.extra = effect2_def 
-        end
-        effect_to_return = effect1_def
-      elseif effect2_def then
-        effect_to_return = effect2_def
+
+      if effect1_def and effect2_def then
+        effect_to_return = SMODS.merge_effects{effect1_def, effect2_def}
       else
-        effect_to_return = nil 
+        effect_to_return = effect1_def or effect2_def
       end
     end
 
     card.is_doodle_calculating = false
 
     if did_probability_pass then
-        return effect_to_return 
+      return effect_to_return
     else
-        return nil, true
+      return
     end
-end
-  
+  end
+
 }
-return { name = {"Jokers"}, items = {doodle} }
+return { name = { "Jokers" }, items = { doodle } }

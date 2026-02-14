@@ -1,7 +1,7 @@
 local pantomimus = {
     object_type = "Joker",
     order = 152,
-
+    lite = true,
     key = "pantomimus",
     config = {
         extra = {
@@ -30,10 +30,14 @@ local pantomimus = {
   
     calculate = function(self, card, context)
       if context.end_of_round and context.cardarea == G.jokers and not context.blueprint then
-        card.ability.extra.chips = card.ability.extra.chips + #G.hand.cards*card.ability.extra.chip_mod
-        return {
-            message = localize('k_upgrade_ex')
-        }
+        SMODS.scale_card(card, {
+	        ref_table = card.ability.extra,
+            ref_value = "chips",
+	        scalar_value = "chip_mod",
+            operation = function(ref_table, ref_value, initial, change)
+	            ref_table[ref_value] = initial + #G.hand.cards * change
+            end,
+        })
       end
       if context.joker_main then 
         return {

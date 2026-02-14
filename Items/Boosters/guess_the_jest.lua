@@ -28,7 +28,7 @@ local guess_the_jest = {
     get_weight = function(self)
         local has_whatsisname = next(SMODS.find_card("j_aij_whatsisname"))
         if has_whatsisname then
-            return 0.15
+            return 0.05 + 0.1 * #SMODS.find_card("j_aij_whatsisname")
         else
             return 0.05
         end
@@ -50,6 +50,11 @@ local guess_the_jest = {
             _card.ability = _card.ability or {}
             _card.ability.from_guess_the_jest = true
             _card.ability.background = tostring(math.random(1,4))
+            for k, v in pairs(G.shared_stickers) do
+                if _card.ability[k] then
+                    _card.ability[k] = false
+                end
+            end
         end
         return _card
     end,

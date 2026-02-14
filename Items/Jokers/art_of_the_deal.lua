@@ -6,7 +6,8 @@ local art_of_the_deal = {
     config = {
       extra = {
         mult = 0,
-        mult_mod = 1
+        mult_mod = 1,
+        money_reset = 25
       }
     },
     rarity = 2,
@@ -20,17 +21,18 @@ local art_of_the_deal = {
     perishable_compat = false,
   
     loc_vars = function(self, info_queue, card)
-        return { vars = {card.ability.extra.mult, card.ability.extra.mult_mod} }
+        return { vars = {card.ability.extra.mult, card.ability.extra.mult_mod, card.ability.extra.money_reset} }
     end,
   
     calculate = function(self, card, context)
-      if context.jest_money_earned and context.jest_earned_sign == "+" and to_big(G.GAME.dollars) > to_big(0) and not context.blueprint then
-        card.ability.extra.mult = card.ability.extra.mult + card.ability.extra.mult_mod
-        return {
-          message = localize('k_upgrade_ex')
-        }
+      if context.money_altered and to_big(context.amount) >= to_big(1) and to_big(G.GAME.dollars) > to_big( card.ability.extra.money_reset) and not context.blueprint then
+        SMODS.scale_card(card, {
+	        ref_table = card.ability.extra,
+            ref_value = "mult",
+	        scalar_value = "mult_mod",
+        })
       end
-      if to_big(G.GAME.dollars) <= to_big(0) and card.ability.extra.mult ~= 0 and not context.blueprint then
+      if to_big(G.GAME.dollars) <= to_big( card.ability.extra.money_reset) and card.ability.extra.mult ~= 0 and not context.blueprint then
         card.ability.extra.mult = 0
         return {
             message = localize('k_reset'),

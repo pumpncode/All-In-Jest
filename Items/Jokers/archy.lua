@@ -14,7 +14,7 @@ local archy = {
     unlocked = false,
     discovered = false,
     blueprint_compat = false,
-    eternal_compat = false,
+    eternal_compat = true,
     soul_pos = { x = 0, y = 5},
   
     loc_vars = function(self, info_queue, card)
@@ -22,7 +22,7 @@ local archy = {
     end,
   
     calculate = function(self, card, context)
-        if context.entering_shop then
+        if context.starting_shop then
             if G.shop_jokers then
                 for i = 1, #G.shop_jokers.cards do
                     G.shop_jokers.cards[i].ability.couponed = true

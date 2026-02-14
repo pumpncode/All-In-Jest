@@ -11,7 +11,7 @@ local guiser = {
   rarity = 3,
   pos = { x = 1, y = 6},
   atlas = 'joker_atlas',
-  cost = 8,
+  cost = 10,
   unlocked = true,
   discovered = false,
   blueprint_compat = false,
@@ -28,14 +28,25 @@ local guiser = {
   calculate = function(self, card, context)
     if context.using_consumeable and not context.blueprint then
       if context.consumeable.ability.set == "Tarot" then
-        card.ability.extra_value = card.ability.extra_value + card.ability.extra.money
+        SMODS.scale_card(card, {
+          ref_table = card.ability,
+          ref_value = "extra_value",
+          scalar_table = card.ability.extra,
+          scalar_value = "money",
+          scaling_message = {
+            message = localize('k_val_up'),
+            colour = G.C.MONEY
+          },
+          block_overrides = {
+            value = true,
+            scalar = true,
+            message = true,
+          }
+        })
         card:set_cost()
-        return {
-          message = localize('k_val_up'),
-          colour = G.C.MONEY
-        }
+        return nil, true
+      end
     end
-  end
   end
 }
 return { name = {"Jokers"}, items = {guiser} }

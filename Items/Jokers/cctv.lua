@@ -14,7 +14,7 @@ local cctv = {
     cost = 6,
     unlocked = true,
     discovered = false,
-    blueprint_compat = false,
+    blueprint_compat = true,
     eternal_compat = true,
   
     loc_vars = function(self, info_queue, card)
@@ -43,7 +43,7 @@ local cctv = {
     end,
   
     calculate = function(self, card, context)
-      if context.removed and not context.blueprint then
+      if context.removed then
         local glass_shattered = 0
         for d = 1, #context.removed do
             if context.removed[d].config.center == G.P_CENTERS.m_glass and context.removed[d].shattered then
@@ -56,7 +56,7 @@ local cctv = {
                     end
                     local index = 0
                     if #valid_cards > 0 and #G.hand.cards > 0 then
-                        index = valid_cards[math.random(#valid_cards)]
+                        index = valid_cards[pseudorandom('aij_cctv', 1, #valid_cards)]
                         G.hand.cards[index]:set_ability(G.P_CENTERS.m_glass, nil, true) 
                         G.E_MANAGER:add_event(Event({
                             func = function()

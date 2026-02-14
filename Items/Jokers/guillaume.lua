@@ -31,17 +31,21 @@ local guillaume = {
     end,
   
     calculate = function(self, card, context)
-      if context.end_of_round and G.jokers and not context.blueprint and G.GAME.blind.boss and #G.jokers.cards < 5 and context.main_eval then
-        card_eval_status_text(card,'extra',nil,nil,nil,{message='+1 Joker Slot'})
-        G.jokers.config.card_limit = G.jokers.config.card_limit + card.ability.extra.joker_slots_mod
-        card.ability.extra.joker_slots = card.ability.extra.joker_slots + card.ability.extra.joker_slots_mod
+      if context.end_of_round and G.jokers and not context.blueprint and context.beat_boss and #G.jokers.cards < 5 and context.main_eval then
+        G.jokers:change_size(card.ability.extra.joker_slots_mod)
+        SMODS.scale_card(card, {
+	        ref_table = card.ability.extra,
+          ref_value = "joker_slots",
+	        scalar_value = "joker_slots_mod",
+          message_key = 'a_aij_joker_slots'
+        })
       end
     end,
     add_to_deck = function(self, card, from_debuff)
-        G.jokers.config.card_limit = G.jokers.config.card_limit + card.ability.extra.joker_slots
+        G.jokers:change_size(card.ability.extra.joker_slots)
     end,
     remove_from_deck = function(self, card, from_debuff)
-        G.jokers.config.card_limit = G.jokers.config.card_limit - card.ability.extra.joker_slots
+        G.jokers:change_size(-card.ability.extra.joker_slots)
     end,
   
 }

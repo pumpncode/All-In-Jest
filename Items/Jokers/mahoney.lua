@@ -19,22 +19,20 @@ local mahoney = {
   
     loc_vars = function(self, info_queue, card)
         info_queue[#info_queue+1] = {set = 'Tag', key = 'tag_voucher'}
+        local numerator, denominator = SMODS.get_probability_vars(card, 1, card.ability.extra.odds)
         return {
             vars = {
-                G.GAME.probabilities.normal,
-                card.ability.extra.odds
+                numerator, denominator,
             }
         }
     end,
   
     calculate = function(self, card, context)
-        if context.skip_blind and pseudorandom('mahoney') < G.GAME.probabilities.normal / card.ability.extra.odds then
+        if context.skip_blind and SMODS.pseudorandom_probability(card, 'mahoney', 1, card.ability.extra.odds) then
             G.E_MANAGER:add_event(Event({
                 func = (function()
-                    add_tag(Tag('tag_voucher'))
                     card:juice_up()
-                    play_sound('generic1', 0.9 + math.random()*0.1, 0.8)
-                    play_sound('holo1', 1.2 + math.random()*0.1, 0.4)
+                    jest_add_tag('tag_voucher')
                     return true
                 end)
             }))

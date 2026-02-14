@@ -7,13 +7,13 @@ local animatronic = {
     extra = {
       handsize_mod = 1,
       handsize = 0,
-      cap = 3
+      cap = 4
     }
   },
-  rarity = 1,
+  rarity = 2,
   pos = { x = 12, y = 7 },
   atlas = 'joker_atlas',
-  cost = 4,
+  cost = 6,
   unlocked = true,
   discovered = false,
   blueprint_compat = false,
@@ -33,18 +33,20 @@ local animatronic = {
     if context.before and context.scoring_name and not context.blueprint then
       if context.poker_hands and next(context.poker_hands['Straight']) then
         if card.ability.extra.handsize < card.ability.extra.cap then
-          card.ability.extra.handsize = card.ability.extra.handsize + card.ability.extra.handsize_mod
+          SMODS.scale_card(card, {
+	            ref_table = card.ability.extra,
+                ref_value = "handsize",
+	            scalar_value = "handsize_mod",
+                message_key = 'a_handsize'
+          })
           G.hand:change_size(card.ability.extra.handsize_mod)
-          return {
-            message = "+1 Hand Size"
-          }
         end
       else
         if card.ability.extra.handsize > 0 then
           G.hand:change_size(-card.ability.extra.handsize)
           card.ability.extra.handsize = 0
           return {
-            message = "Reset!"
+            message = localize('k_reset')
           }
         end
       end

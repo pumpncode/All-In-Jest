@@ -14,13 +14,14 @@ local infinite_jest = {
     discovered = false,
     blueprint_compat = true,
     eternal_compat = true,
+    lite = true,
   
     loc_vars = function(self, info_queue, card)
   
     end,
   
     calculate = function(self, card, context)
-      if context.end_of_round and G.GAME.blind.boss and context.main_eval then
+      if context.end_of_round and context.beat_boss and context.main_eval then
         local eff_card = context.blueprint_card or card
         --literally just black hole
         update_hand_text({sound = 'button', volume = 0.7, pitch = 0.8, delay = 0.3}, {handname=localize('k_all_hands'),chips = '...', mult = '...', level=''})
@@ -46,6 +47,7 @@ local infinite_jest = {
             level_up_hand(eff_card, k, true)
         end
         update_hand_text({sound = 'button', volume = 0.7, pitch = 1.1, delay = 0}, {mult = 0, chips = 0, handname = '', level = ''})
+        return nil, true
       end
     end
   

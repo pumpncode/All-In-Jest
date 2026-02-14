@@ -4,16 +4,18 @@
   "prefix": "aij",
   "author": [
     "Nevernamed",
-    "survivalaiden",
-    "RattlingSnow353"
+    "Survivalaren",
+    "RattlingSnow353",
+    "Jumbocarrot",
+    "ejwu2"
   ],
   "priority": 9999,
-  "description": "A vanilla-style mod made of content with art made by Nevernamed",
+  "description": "A massive vanilla-style mod made of content with art made by Nevernamed",
   "main_file": "nevernamed.lua",
   "badge_colour": "8b61ad",
-  "version": "0.5.2",
+  "version": "0.6.3",
   "dependencies": [
-    "Steamodded (>=1.0.0~ALPHA-1423h)",
+    "Steamodded (>=1.0.0~BETA-1221a)",
     "Lovely (>=0.7.1)"
   ]
 }

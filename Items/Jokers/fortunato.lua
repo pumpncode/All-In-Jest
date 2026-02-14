@@ -1,7 +1,7 @@
 local fortunato = {
   object_type = "Joker",
   order = 1006,
-
+  lite = true,
   key = "fortunato",
   config = {
     extra = {
@@ -68,20 +68,18 @@ local fortunato = {
     end
     if context.individual and context.cardarea == G.play then
       if context.other_card.ability.name == 'Stone Card' and not context.blueprint then
-        card.ability.extra.x_mult = card.ability.extra.x_mult + card.ability.extra.xmult_mod
-        return {
-          extra = { focus = card, message = localize('k_upgrade_ex') },
-          card = card,
-        }
+        SMODS.scale_card(card, {
+	        ref_table = card.ability.extra,
+            ref_value = "x_mult",
+	        scalar_value = "xmult_mod",
+        })
       end
     end
 
     if context.joker_main then
       if card.ability.extra.x_mult > 1 then
         return {
-          message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.x_mult } },
-          Xmult_mod = card.ability.extra.x_mult,
-          card = card
+          xmult = card.ability.extra.x_mult,
         }
       end
     end

@@ -22,11 +22,11 @@ local totally_nuts = {
     end,
   
     calculate = function(self, card, context)
-      if context.selling_card then
+      if context.selling_card and not context.blueprint then
         for _, card_type in ipairs(SMODS.ConsumableType.ctype_buffer) do
             if context.card.ability.set == card_type then
                 card_eval_status_text(card, 'extra', nil, nil, nil, {message = localize('k_eaten_ex'),colour = G.C.FILTER})
-                card:start_dissolve()
+                SMODS.destroy_cards(card, nil, nil, true)
             end
         end
       end

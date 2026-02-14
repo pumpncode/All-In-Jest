@@ -16,19 +16,19 @@ SMODS.current_mod.optional_features = {
 SMODS.injectItems = function()
     injectitems_ref()
     G.AIJ.shared_mystery_sprites = G.AIJ.shared_mystery_sprites or {
-        bg1 = Sprite(0, 0, 1, 1, G.ASSET_ATLAS['aij_mystery_atlas'], {
+        bg1 = SMODS.create_sprite(0, 0, 1, 1, 'aij_mystery_atlas', {
             x = 0,
             y = 0
         }),
-        bg2 = Sprite(0, 0, 1, 1, G.ASSET_ATLAS['aij_mystery_atlas'], {
+        bg2 = SMODS.create_sprite(0, 0, 1, 1, 'aij_mystery_atlas', {
           x = 1,
           y = 0
         }),
-        bg3 = Sprite(0, 0, 1, 1, G.ASSET_ATLAS['aij_mystery_atlas'], {
+        bg3 = SMODS.create_sprite(0, 0, 1, 1, 'aij_mystery_atlas', {
           x = 2,
           y = 0
         }),
-        bg4 = Sprite(0, 0, 1, 1, G.ASSET_ATLAS['aij_mystery_atlas'], {
+        bg4 = SMODS.create_sprite(0, 0, 1, 1, 'aij_mystery_atlas', {
           x = 3,
           y = 0
       }),
@@ -51,7 +51,27 @@ SMODS.Atlas {
     path = "decks.png",
     px = 71,
     py = 95
-  }
+}
+SMODS.Atlas {
+    key = "sleeve_atlas",
+    path = "sleeves.png",
+    px = 73,
+    py = 95
+}
+SMODS.Atlas {
+    key = "stickers_atlas",
+    path = "stickers.png",
+    px = 71,
+    py = 95
+}
+SMODS.Atlas { 
+    key = 'blinds', 
+    path = 'blinds.png', 
+    px = 34, 
+    py = 34, 
+    frames = 21, 
+    atlas_table = 'ANIMATION_ATLAS' 
+}
 SMODS.Atlas {
   key = "legendary_atlas",
   path = "legendaries.png",
@@ -67,6 +87,12 @@ SMODS.Atlas {
 SMODS.Atlas {
   key = "enhancements_atlas",
   path = "enhancements.png",
+  px = 71, 
+  py = 95
+}
+SMODS.Atlas {
+  key = "vouchers_atlas",
+  path = "vouchers.png",
   px = 71,
   py = 95
 }
@@ -82,6 +108,13 @@ SMODS.Atlas {
   path = 'familiar.png',
   px = 71,
   py = 95
+}
+
+SMODS.Atlas {
+  key = 'partner_atlas',
+  path = 'partner_atlas.png',
+  px = 46,
+  py = 58,
 }
 
 SMODS.Atlas {
@@ -108,10 +141,6 @@ SMODS.Shader {
     key = 'silhouette',
     path = 'silhouette.fs',
  }
-SMODS.Shader {
-    key = 'chaotic',
-    path = 'chaotic.fs',
- }
 
 SMODS.Rarity({
 	key = "familiar_face",
@@ -137,6 +166,14 @@ SMODS.Gradient {
     interpolation = 'trig'
 }
 SMODS.Gradient {
+    key = 'silver',
+    colours = {
+        HEX('afbbca'), HEX('9cacbe')
+    },
+    cycle = 5,
+    interpolation = 'trig'
+}
+SMODS.Gradient {
     key = 'stellar',
     colours = {
         HEX('666694'), HEX('7a73bb')
@@ -148,12 +185,64 @@ AllInJest = {}
 assert(SMODS.load_file('Utils/context.lua'))()
 assert(SMODS.load_file('Utils/draw.lua'))()
 assert(SMODS.load_file('Utils/functions.lua'))()
-assert(SMODS.load_file('Utils/overrides.lua'))()
+assert(SMODS.load_file('Utils/functions_value_mod.lua'))()
+assert(SMODS.load_file('Utils/hooks.lua'))()
 assert(SMODS.load_file('Utils/ui.lua'))()
+if next(SMODS.find_mod("unBlindShopGUI")) then
+    assert(SMODS.load_file('Utils/UnBlind_crossmod.lua'))()
+end
 
 local folders = NFS.getDirectoryItems(mod_path.."Items")
 local objects = {}
 
+for _, data in ipairs(AllInJest.deck_skins) do
+  for _, suit in ipairs(data.suits) do
+    local key = data.id .. "_" .. suit:lower()
+
+    -- Common ranks used in both palettes
+    local ranks = { 'King', 'Queen', 'Jack' }
+    local display_ranks = ranks
+    
+    local atlas_lc = SMODS.Atlas {
+      key = key .. '_lc',
+      path = 'collabs/lc/' .. key .. '_lc.png',
+      px = 71,
+      py = 95
+    }
+
+    local atlas_hc = SMODS.Atlas {
+      key = key .. '_hc',
+      path = 'collabs/hc/' .. key .. '_hc.png',
+      px = 71,
+      py = 95
+    }
+
+    SMODS.DeckSkin {
+      key = key,
+      suit = suit,
+      loc_txt = {
+        ['en-us'] = data.name
+      },
+      palettes = {
+        {
+          key = 'lc',
+          ranks = ranks,
+          display_ranks = display_ranks,
+          pos_style = 'ranks',
+          atlas = atlas_lc.key
+        },
+        {
+          key = 'hc',
+          ranks = ranks,
+          display_ranks = display_ranks,
+          pos_style = 'ranks',
+          atlas = atlas_hc.key,
+          hc_default = true
+        }
+      }
+    }
+  end
+end
 local function collect_item_files(base_fs, rel, out)
     for _, name in ipairs(NFS.getDirectoryItems(base_fs)) do
         local abs = base_fs.."/"..name
@@ -176,6 +265,9 @@ local function load_items(curr_obj)
         return
     end
     for _, item in ipairs(curr_obj.items) do
+        if All_in_Jest.config.aij_lite and not item.lite then
+            goto continue
+        end
         item.ignore             = item.ignore             or false
         item.jest_spec_moon     = item.jest_spec_moon     or false
         item.jest_rec_paperback = item.jest_rec_paperback or false
@@ -199,8 +291,8 @@ local function load_items(curr_obj)
         end
         if SMODS[item.object_type] and not item.ignore then
             SMODS[item.object_type](item)
-        elseif CardSleeves and CardSleeves[item.object_type] and not item.ignore then
-            CardSleeves[item.object_type](item)
+        elseif item.object_loader and not item.ignore then
+            item.object_loader[item.object_type](item)
         elseif not item.ignore then
             print("Error loading item "..item.key.." of unknown type "..item.object_type)
         end

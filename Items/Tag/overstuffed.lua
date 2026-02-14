@@ -3,9 +3,9 @@ local overstuffed = {
     key = 'overstuffed',
     pos = { x = 3, y = 0 },
     atlas = 'tag_atlas',
-
+    lite = true,
     discovered = false,
-    order = 4,
+    order = 5,
     config = {},
 
     loc_vars = function(self, info_queue)

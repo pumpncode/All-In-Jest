@@ -1,7 +1,7 @@
 local kasperle = {
     object_type = "Joker",
     order = 112,
-
+    lite = true,
     key = "kasperle",
     config = {
       extra = { xmult = 3 }
@@ -16,11 +16,11 @@ local kasperle = {
     eternal_compat = true,
   
     loc_vars = function(self, info_queue, card)
-        local active_text = "(Inactive)"
+        local active_text = "("..localize('k_inactive')..")"
         if G.GAME.jest_kasperle_voucher_ante then 
-            active_text = "(Active!)"
+            active_text = "("..localize('k_active')..")"
         else
-            active_text = "(Inactive)"
+            active_text = "("..localize('k_inactive')..")"
         end
         return { vars = {
             card.ability.extra.xmult,
@@ -32,31 +32,19 @@ local kasperle = {
         if context.joker_main then
             if G.GAME.jest_kasperle_voucher_ante then
                 return {
-                    Xmult_mod = card.ability.extra.xmult,
-                    card = card,
-                    message = localize{type='variable',key='a_xmult',vars={card.ability.extra.xmult}}
+                    xmult = card.ability.extra.xmult
                 }
             end
         end
     end
 }
-local ease_anteref = ease_ante
-function ease_ante(mod)
-    if mod ~= 0 then
-        G.GAME.jest_kasperle_voucher_ante = false
-    end
-    
-    local ref = ease_anteref(mod)
-    return ref
-end
-
-local redeemref = Card.redeem
+local aij_card_redeem_ref = Card.redeem
 function Card:redeem()
     if self.ability.set == "Voucher" then
         G.GAME.jest_kasperle_voucher_ante = true
     end
     
-    local ref = redeemref(self)
+    local ref = aij_card_redeem_ref(self)
     return ref
 end
 return { name = {"Jokers"}, items = {kasperle} }

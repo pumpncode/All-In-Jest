@@ -35,10 +35,11 @@ local taillefer = {
   
     calculate = function(self, card, context)
       if context.before and not context.blueprint then 
-        card.ability.extra.xmult = card.ability.extra.xmult + card.ability.extra.xmult_mod
-        return {
-            message = localize('k_upgrade_ex')
-        }
+        SMODS.scale_card(card, {
+	        ref_table = card.ability.extra,
+            ref_value = "xmult",
+	        scalar_value = "xmult_mod",
+        })
       end 
       if context.joker_main then
         return {
@@ -48,38 +49,16 @@ local taillefer = {
       if context.end_of_round and G.GAME.blind.boss and not context.blueprint and context.main_eval then
         card.ability.extra.current_boss_blinds = card.ability.extra.current_boss_blinds + 1
         if card.ability.extra.current_boss_blinds >= card.ability.extra.boss_blinds then
-            G.E_MANAGER:add_event(Event({
-                trigger = 'after',
-                delay = 0.3,
-                blockable = false,
-                func = function()
-                    play_sound('tarot1')
-                    card.T.r = -0.2
-                    card:juice_up(0.3, 0.4)
-                    card.states.drag.is = true
-                    card.children.center.pinch.x = true
-                    G.E_MANAGER:add_event(Event({
-                        trigger = 'after',
-                        delay = 0.3,
-                        blockable = false,
-                        func = function()
-                            G.jokers:remove_card(card)
-                            card:remove()
-                            card = nil
-                            return true;
-                        end
-                    }))
-                    return true
-                end
-            }))
+            SMODS.destroy_cards(card, nil, nil, true)
             return {
                 message = 'Killed',
                 colour = G.C.RED
             }
         else 
-            card_eval_status_text(card, 'extra', nil, nil, nil, { message = card.ability.extra.current_boss_blinds .. '/' .. card.ability.extra.boss_blinds})
+            return {
+                message = card.ability.extra.current_boss_blinds .. '/' .. card.ability.extra.boss_blinds
+            }
         end
-        
       end
     end
   

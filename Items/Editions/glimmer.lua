@@ -29,12 +29,12 @@ local glimmer = {
 		end
 	end,
     in_shop = true,
-    weight = 3,
+    weight = 6,
     extra_cost = 3,
     get_weight = function(self)
         if G.GAME then
             if G.GAME.selected_back.effect.center.key ~= 'b_plasma' then
-                return G.GAME.edition_rate * self.weight
+                return G.GAME.jest_fairy_edition_rate * self.weight
             end
         end
         return 0
@@ -50,5 +50,4 @@ local glimmer = {
 
     shader = 'glimmer'
 }
-
 return {name = "Editions", items = {glimmer, glimmer_shader}}

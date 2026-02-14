@@ -18,10 +18,10 @@ local melancholic_joker = {
     eternal_compat = true,
   
     loc_vars = function(self, info_queue, card)
+        local numerator, denominator = SMODS.get_probability_vars(card, 1, card.ability.extra.odds)
         return {
             vars = {
-                G.GAME.probabilities.normal,
-                card.ability.extra.odds
+                numerator, denominator,
             }
         }
     end,
@@ -29,10 +29,11 @@ local melancholic_joker = {
     calculate = function(self, card, context)
         if context.individual and context.cardarea == G.play then
             if context.other_card:is_suit("Spades") and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
-                if pseudorandom('melancholic_joker') < G.GAME.probabilities.normal / card.ability.extra.odds then
+                if SMODS.pseudorandom_probability(card, 'melancholic_joker', 1, card.ability.extra.odds) then
+                    local juiced_card = context.blueprint_card or card
                     G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
                     return {
-                        focus = card,
+                        focus = juiced_card,
                         message = localize('k_plus_spectral'),
                         func = function()
                             G.E_MANAGER:add_event(Event({
@@ -48,7 +49,7 @@ local melancholic_joker = {
                             }))
                         end,
                         colour = G.C.SECONDARY_SET.Spectral,
-                        card = card
+                        card = juiced_card
                     }
                 end
             end

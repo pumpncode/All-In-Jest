@@ -5,10 +5,10 @@ local the_clown_show = {
     key = "the_clown_show",
     config = {
       extra = {
-          chips = 6
+          chips = 8
       }
     },
-    rarity = 2,
+    rarity = 1,
     pos = { x = 8, y = 0 },
     atlas = 'joker_atlas',
     cost = 6,
@@ -28,7 +28,7 @@ local the_clown_show = {
   
     calculate = function(self, card, context)
       if context.buying_card then
-        if context.card.ability.set == "Joker" and context.cardarea == G.jokers then
+        if context.card.ability.set == "Joker" and context.cardarea == G.jokers and not context.blueprint then
             return {
               message = localize('k_upgrade_ex')
             }

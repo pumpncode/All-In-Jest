@@ -1,27 +1,69 @@
 local silver_screen = {
     object_type = "Joker",
     order = 98,
-    ignore = true,
 
     key = "silver_screen",
     config = {
       
     },
-    rarity = 1,
+    rarity = 2,
     pos = { x = 18, y = 3 },
     atlas = 'joker_atlas',
-    cost = 4,
+    cost = 6,
     unlocked = true,
     discovered = false,
-    blueprint_compat = false,
-    eternal_compat = false,
+    blueprint_compat = true,
+    eternal_compat = true,
   
     loc_vars = function(self, info_queue, card)
-  
+        if not card.edition or (card.edition and not card.edition.key == 'e_aij_silver') then
+        info_queue[#info_queue+1] = G.P_CENTERS.e_aij_silver
+        end
     end,
   
     calculate = function(self, card, context)
-      
+        if context.remove_playing_cards then
+
+            -- Get array of valid cards to apply silver to
+            local hand_cards = {}
+            for i = 1, #G.hand.cards do
+                if G.hand.cards[i].edition == nil then
+                    local to_be_destroyed = false
+                    for k, v in pairs(context.removed) do
+                        if G.hand.cards[i] == v then
+                            to_be_destroyed = true
+                        end
+                    end
+                    if not to_be_destroyed then
+                        table.insert(hand_cards, G.hand.cards[i])
+                    end
+                end
+            end
+            
+            local enhanced = 0 -- Count so "Silver!" only pops up if a face card was destroyed
+            for k, v in pairs(context.removed) do
+                if v:is_face() and #hand_cards > 0 then
+                    enhanced = enhanced + 1
+
+                    local playing_card, chosen_index = pseudorandom_element(hand_cards, pseudoseed('jest_silver_screen'))
+                    table.remove(hand_cards, chosen_index) -- Should prevent one card being enhanced multiple times
+
+                    local edition = {aij_silver = true}
+                    G.E_MANAGER:add_event(Event({
+                        func = function()
+                            playing_card:set_edition(edition, true)
+                            return true
+                        end
+                    }))
+                end
+            end
+            if enhanced > 0 then
+                return {
+                    message = localize("aij_silver", "labels") .. "!",
+                    colour = G.C.GREY
+                }
+            end
+        end
     end
   
 }

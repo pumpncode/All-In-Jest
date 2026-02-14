@@ -7,13 +7,13 @@ local egg_cc = {
       extra = {
         chips = 0,
         chip_mod = 9,
-        sell_value = 2
+        sell_value = 1
       }
     },
     rarity = 1,
     pos = { x = 14, y = 8},
     atlas = 'joker_atlas',
-    cost = 4,
+    cost = 6,
     unlocked = true,
     discovered = false,
     blueprint_compat = true,
@@ -39,8 +39,24 @@ local egg_cc = {
         end
         G.E_MANAGER:add_event(Event({
           func = function()
-              card.ability.extra.chips = card.ability.extra.chips + card.ability.extra.chip_mod
-              card.ability.extra_value = card.ability.extra_value + card.ability.extra.sell_value
+              SMODS.scale_card(card, {
+	            ref_table = card.ability.extra,
+                ref_value = "chips",
+	            scalar_value = "chip_mod",
+                no_message = true,
+              })
+              SMODS.scale_card(card, {
+	            ref_table = card.ability,
+                ref_value = "extra_value",
+                scalar_table = card.ability.extra,
+	            scalar_value = "sell_value",
+                no_message = true,
+                block_overrides = {
+	                value = true,
+	                scalar = true,
+	                message = true,
+                }
+              })
               card:set_cost()
               return true
           end

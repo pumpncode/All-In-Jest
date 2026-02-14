@@ -1,11 +1,11 @@
 local naiteh = {
     object_type = "Joker",
     order = 1058,
-
+    lite = true,
     key = "naiteh",
     config = {
       extra = {
-        h_size = 0,
+        h_size = 1,
         h_size_mod = 1,
       }
     },
@@ -29,26 +29,26 @@ local naiteh = {
         }
     end,
 
+    calculate = function(self, card, context)
+        if context.end_of_round and context.beat_boss and context.main_eval and not context.blueprint then
+            SMODS.scale_card(card, {
+	            ref_table = card.ability.extra,
+                ref_value = "h_size",
+	            scalar_value = "h_size_mod",
+            })
+            G.hand:change_size(card.ability.extra.h_size_mod)
+            return nil, true
+        end
+    end,
+    remove_from_deck = function(self, card, from_debuff)
+        if card.ability.extra.h_size > 0 then
+            G.hand:change_size(-card.ability.extra.h_size)
+        end
+    end,
     add_to_deck = function(self, card, from_debuff)
         if card.ability.extra.h_size > 0 then
             G.hand:change_size(card.ability.extra.h_size)
         end
-    end,
-    calculate = function(self, card, context)
-        if context.end_of_round and G.GAME.blind.boss and context.main_eval and not context.blueprint then
-            card.ability.extra.h_size = card.ability.extra.h_size + card.ability.extra.h_size_mod
-            G.hand:change_size(card.ability.extra.h_size_mod)
-            return {
-                message = localize('k_upgrade_ex'),
-                card = card
-            }
-        end
-    end,
-    remove_from_deck = function(self, card, from_debuff)
-        G.hand:change_size(-card.ability.extra.h_size)
-    end,
-    add_to_deck = function(self, card, from_debuff)
-        G.hand:change_size(card.ability.extra.h_size)
     end,
 }
 return { name = {"Jokers"}, items = {naiteh} }

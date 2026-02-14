@@ -5,7 +5,7 @@ local goofball = {
     key = "goofball",
     config = {
         extra = {
-            percent = 5
+            percent = 8
         }
     },
     rarity = 3,
@@ -50,6 +50,5 @@ local goofball = {
         end
         return false
     end,
-
 }
 return { name = { "Jokers" }, items = { goofball } }
